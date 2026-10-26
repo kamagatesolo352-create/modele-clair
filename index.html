@@ -3,14 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ma Boutique - Modèle Clair</title>
+<title>Boutique</title>
 <style>
 :root{--c:#1d4ed8;--c2:#38bdf8;--bg:#f4f7fc;--t:#1a2540}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:Arial,sans-serif;background:var(--bg);color:var(--t)}
 header{background:var(--c);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
-header h1{font-size:20px}
+header h1{font-size:20px;display:flex;align-items:center;gap:8px}
+#logo img{height:32px;display:block}
 #cartBtn{background:#fff;color:var(--c);border:0;border-radius:20px;padding:8px 14px;font-weight:bold;font-size:15px}
 .hero{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;padding:44px 16px;text-align:center}
 .hero h2{font-size:26px;margin-bottom:10px}
@@ -61,41 +62,38 @@ footer{text-align:center;padding:18px;color:#7a88a8;font-size:13px}
 </head>
 <body>
 <header>
-<h1>🛍️ <span id="nomB">Ma Boutique</span></h1>
+<h1><span id="logo"></span><span id="nomB"></span></h1>
 <button id="cartBtn" onclick="toggle()">Panier (<span id="count">0</span>)</button>
 </header>
 
 <div class="hero">
-<h2>Vos articles préférés, livrés chez vous</h2>
-<p>Commandez en quelques clics sur WhatsApp</p>
-<a class="cta" href="#catalogue">Voir les articles</a>
+<h2 id="tAcc"></h2>
+<p id="tSous"></p>
+<a class="cta" id="tBtn" href="#catalogue"></a>
 </div>
 
 <div class="adv">
-<div><b>🚚</b>Livraison rapide</div>
-<div><b>💳</b>Mobile Money ou à la livraison</div>
-<div><b>⭐</b>Qualité garantie</div>
+<div><b>🚚</b><span id="lRap"></span></div>
+<div><b>💳</b><span id="lPay"></span></div>
+<div><b>⭐</b><span id="lGar"></span></div>
 </div>
 
-<h2 class="t" id="catalogue">Nos articles</h2>
+<h2 class="t" id="catalogue"></h2>
 <div class="search"><input id="q" placeholder="🔍 Rechercher un article..." oninput="grille()"></div>
 <div class="bar" id="bar"></div>
 <div class="grid" id="grid"></div>
 
-<h2 class="t">Avis de nos clients</h2>
-<div class="avis">
-<div>⭐⭐⭐⭐⭐<br>Très bon service, j'ai reçu ma commande le jour même !<b>Awa, Abobo</b></div>
-<div>⭐⭐⭐⭐⭐<br>Les articles sont conformes aux photos. Je recommande.<b>Koffi, Yopougon</b></div>
-<div>⭐⭐⭐⭐<br>Prix corrects et vendeur très sérieux.<b>Mariam, Cocody</b></div>
-</div>
+<h2 class="t" id="tAvis"></h2>
+<div class="avis" id="avis"></div>
 
 <div class="contact">
-<h2>Une question ? Écrivez-nous</h2>
-<p>📍 <span id="lieuB">Abidjan</span></p>
-<p>Réponse rapide sur WhatsApp</p>
+<h2 id="tCont"></h2>
+<p>📍 <span id="lieuB"></span></p>
+<p id="mailB"></p>
+<p id="tMsg"></p>
 <a class="wa" id="waLink" href="#" target="_blank">💬 Discuter sur WhatsApp</a>
 </div>
-<footer>Modèle de démonstration · © <span id="nomF">Ma Boutique</span></footer>
+<footer>© <span id="nomF"></span></footer>
 
 <a id="fab" href="#" target="_blank">💬</a>
 <div id="toast">Ajouté au panier ✓</div>
@@ -106,55 +104,65 @@ footer{text-align:center;padding:18px;color:#7a88a8;font-size:13px}
 <div class="pf">
 <input id="nom" placeholder="Votre nom">
 <input id="lieu" placeholder="Quartier / lieu de livraison">
-<div class="total"><span>Total</span><span id="total">0 FCFA</span></div>
+<div class="total"><span>Total</span><span id="total"></span></div>
 <button id="send" onclick="commander()">Commander sur WhatsApp</button>
 </div>
 </div>
 
+<script src="config.js"></script>
 <script>
-// ===== À CHANGER POUR CHAQUE CLIENT =====
-var WHATSAPP = "2250000000000";
-var NOM = "Ma Boutique";
-var LIEU = "Abidjan";
-var produits = [
-{id:1,nom:"Chemise élégante",prix:8000,cat:"Vêtements",e:"👕",b:"Nouveau"},
-{id:2,nom:"Pantalon classe",prix:12000,cat:"Vêtements",e:"👖"},
-{id:3,nom:"Robe d'été",prix:15000,cat:"Vêtements",e:"👗",b:"Promo"},
-{id:4,nom:"Baskets sport",prix:20000,cat:"Chaussures",e:"👟",b:"Nouveau"},
-{id:5,nom:"Sandales",prix:6000,cat:"Chaussures",e:"🩴"},
-{id:6,nom:"Casquette",prix:3000,cat:"Accessoires",e:"🧢"},
-{id:7,nom:"Sac à main",prix:10000,cat:"Accessoires",e:"👜",b:"Promo"},
-{id:8,nom:"Montre",prix:18000,cat:"Accessoires",e:"⌚"}
-];
-// =========================================
-var panier = {};
-var filtre = "Tout";
+var C = window.CONFIG;
+if(!C){document.body.innerHTML='<p style="padding:20px">Erreur : le fichier config.js est introuvable.</p>';throw new Error("config");}
+var produits = C.produits, DEV = C.devise || "FCFA", T = C.textes, L = C.livraison;
+var panier = {}, filtre = "Tout", cats = ["Tout"];
 
-function fcfa(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g," ")+" FCFA";}
+function $(id){return document.getElementById(id);}
+function fcfa(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g," ")+" "+DEV;}
 function trouve(id){return produits.filter(function(x){return x.id==id;})[0];}
 
-function barre(){
-  var cats = ["Tout"];
+function appliquer(){
+  var r = document.documentElement.style, k = C.couleurs || {};
+  if(k.principale) r.setProperty("--c",k.principale);
+  if(k.secondaire) r.setProperty("--c2",k.secondaire);
+  if(k.fond) r.setProperty("--bg",k.fond);
+  document.title = C.nom;
+  if(C.logo){$("logo").innerHTML='<img src="'+C.logo+'" alt="">';}else{$("logo").textContent=C.icone;}
+  $("nomB").textContent = C.nom; $("nomF").textContent = C.nom;
+  $("tAcc").textContent = T.accroche; $("tSous").textContent = T.sousTitre; $("tBtn").textContent = T.bouton;
+  $("lRap").textContent = L.rapide; $("lPay").textContent = L.paiement; $("lGar").textContent = L.garantie;
+  $("catalogue").textContent = T.titreCatalogue; $("tAvis").textContent = T.titreAvis;
+  $("tCont").textContent = T.titreContact; $("tMsg").textContent = T.messageContact;
+  $("lieuB").textContent = C.lieu;
+  if(C.email){$("mailB").textContent = "✉️ "+C.email;}
+  var lien = "https://wa.me/"+C.whatsapp;
+  $("waLink").href = lien; $("fab").href = lien;
+  $("avis").innerHTML = (C.avis||[]).map(function(a){
+    var s = ""; for(var i=0;i<a.etoiles;i++){s += "⭐";}
+    return '<div>'+s+'<br>'+a.texte+'<b>'+a.auteur+'</b></div>';
+  }).join("");
   produits.forEach(function(p){if(cats.indexOf(p.cat)<0)cats.push(p.cat);});
-  document.getElementById("bar").innerHTML = cats.map(function(c){
-    return '<button class="'+(c===filtre?"on":"")+'" onclick="setF(\''+c+'\')">'+c+'</button>';
+}
+
+function barre(){
+  $("bar").innerHTML = cats.map(function(c,i){
+    return '<button class="'+(c===filtre?"on":"")+'" onclick="setF('+i+')">'+c+'</button>';
   }).join("");
 }
-function setF(c){filtre=c;barre();grille();}
+function setF(i){filtre=cats[i];barre();grille();}
 
 function grille(){
-  var mot = document.getElementById("q").value.toLowerCase().trim();
+  var mot = $("q").value.toLowerCase().trim();
   var l = produits.filter(function(p){
     return (filtre==="Tout"||p.cat===filtre) && p.nom.toLowerCase().indexOf(mot)>=0;
   });
-  document.getElementById("grid").innerHTML = l.length ? l.map(function(p){
+  $("grid").innerHTML = l.length ? l.map(function(p){
     return '<div class="card">'+(p.b?'<span class="badge">'+p.b+'</span>':'')+'<div class="img">'+p.e+'</div><div class="info"><h3>'+p.nom+'</h3><div class="price">'+fcfa(p.prix)+'</div><button class="add" onclick="ajouter('+p.id+')">Ajouter</button></div></div>';
   }).join("") : '<div class="none">Aucun article trouvé</div>';
 }
 
 function ajouter(id){
   panier[id]=(panier[id]||0)+1;maj();
-  var t=document.getElementById("toast");t.classList.add("on");
+  var t=$("toast");t.classList.add("on");
   setTimeout(function(){t.classList.remove("on");},1200);
 }
 function chg(id,d){panier[id]=(panier[id]||0)+d;if(panier[id]<=0)delete panier[id];maj();}
@@ -166,18 +174,17 @@ function maj(){
     n += q; t += p.prix*q;
     h += '<div class="row"><div>'+p.e+' '+p.nom+'<br><small>'+fcfa(p.prix*q)+'</small></div><div class="qty"><button onclick="chg('+id+',-1)">-</button><span>'+q+'</span><button onclick="chg('+id+',1)">+</button></div></div>';
   });
-  document.getElementById("items").innerHTML = h || '<div class="empty">Votre panier est vide</div>';
-  document.getElementById("count").textContent = n;
-  document.getElementById("total").textContent = fcfa(t);
+  $("items").innerHTML = h || '<div class="empty">Votre panier est vide</div>';
+  $("count").textContent = n;
+  $("total").textContent = fcfa(t);
 }
 
-function toggle(){document.getElementById("panel").classList.toggle("open");}
+function toggle(){$("panel").classList.toggle("open");}
 
 function commander(){
   var ids = Object.keys(panier);
   if(!ids.length){alert("Votre panier est vide");return;}
-  var nom = document.getElementById("nom").value.trim();
-  var lieu = document.getElementById("lieu").value.trim();
+  var nom = $("nom").value.trim(), lieu = $("lieu").value.trim();
   if(!nom||!lieu){alert("Indiquez votre nom et votre lieu de livraison");return;}
   var m = "Bonjour, je souhaite commander :\n", t = 0;
   ids.forEach(function(id){
@@ -186,17 +193,10 @@ function commander(){
     t += p.prix*panier[id];
   });
   m += "\nTotal : "+fcfa(t)+"\nNom : "+nom+"\nLivraison : "+lieu;
-  window.open("https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(m),"_blank");
+  window.open("https://wa.me/"+C.whatsapp+"?text="+encodeURIComponent(m),"_blank");
 }
 
-document.title = NOM;
-document.getElementById("nomB").textContent = NOM;
-document.getElementById("nomF").textContent = NOM;
-document.getElementById("lieuB").textContent = LIEU;
-var lien = "https://wa.me/"+WHATSAPP;
-document.getElementById("waLink").href = lien;
-document.getElementById("fab").href = lien;
-barre();grille();maj();
+appliquer();barre();grille();maj();
 </script>
 </body>
-  </html>
+                                                                    </html>
