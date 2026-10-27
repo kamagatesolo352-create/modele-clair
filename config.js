@@ -11,6 +11,12 @@ window.CONFIG = {
   email: "",
   devise: "FCFA",
 
+  // Connexion à la base de données (clé PUBLIQUE uniquement)
+  supabase: {
+    url: "https://sqdlxotqhwfkfaleaynt.supabase.co",
+    cle: "sb_publishable_kIrNaNVL8V-BbCAZREEfsw_d3cSeTbG"
+  },
+
   // Laisser vide = couleurs du modèle. Sinon, code couleur, ex: "#e11d48"
   couleurs: { principale: "", secondaire: "", fond: "" },
 
@@ -36,9 +42,7 @@ window.CONFIG = {
     { texte: "Prix corrects et vendeur très sérieux.", auteur: "Mariam, Cocody", etoiles: 4 }
   ],
 
-  // b = badge facultatif ("Nouveau", "Promo")
-  // desc = description affichée dans la fiche produit
-  // img = lien d'une photo (facultatif, remplace l'emoji)
+  // Articles de secours (utilisés si la base ne répond pas)
   produits: [
     { id: 1, nom: "Chemise élégante", prix: 8000, cat: "Vêtements", e: "👕", b: "Nouveau", desc: "Chemise légère et confortable, parfaite pour le travail comme pour les sorties." },
     { id: 2, nom: "Pantalon classe", prix: 12000, cat: "Vêtements", e: "👖", desc: "Pantalon bien coupé, tissu résistant, facile à associer." },
@@ -51,9 +55,11 @@ window.CONFIG = {
   ]
 };
 
-// Chargement automatique de la fiche produit
+// Chargement automatique de la fiche produit et de la base de données
 window.addEventListener("load", function () {
-  var s = document.createElement("script");
-  s.src = "fiche.js";
-  document.body.appendChild(s);
+  ["fiche.js", "donnees.js"].forEach(function (f) {
+    var s = document.createElement("script");
+    s.src = f;
+    document.body.appendChild(s);
+  });
 });
